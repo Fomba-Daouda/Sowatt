@@ -1,7 +1,9 @@
-import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text, Alert } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { SowattList } from '@/components/ui/SowattList';
 import { CartList } from '@/components/ui/CartList';
+import { BottomNavBar } from '@/components/ui/BottomNavBar';
+import { LoginButton } from '@/components/ui/LoginButton';
 import { useState } from 'react';
 import { Sowatt } from '@/components/ui/SowattCard';
 
@@ -11,7 +13,7 @@ interface CartItem {
 }
 
 export default function HomeScreen() {
-  const [showCart, setShowCart] = useState(false);
+  const [activeTab, setActiveTab] = useState('Accueil');
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   const sowatts = [
@@ -63,37 +65,78 @@ export default function HomeScreen() {
     console.log('Commande passée:', cartItems);
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <ThemedView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Sowatt</Text>
-          <TouchableOpacity 
-            style={styles.cartButton}
-            onPress={() => setShowCart(!showCart)}
-          >
-            <Text style={styles.cartIcon}>🛒</Text>
-            {cartItems.length > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {showCart ? (
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'Accueil':
+        return (
+          <SowattList 
+            sowatts={sowatts} 
+            onAddToCart={handleAddToCart}
+          />
+        );
+      case 'Panier':
+        return (
           <CartList
             items={cartItems}
             onRemoveItem={handleRemoveItem}
             onUpdateQuantity={handleUpdateQuantity}
             onCheckout={handleCheckout}
           />
-        ) : (
-          <SowattList 
-            sowatts={sowatts} 
-            onAddToCart={handleAddToCart}
+        );
+      case 'Compte':
+        return (
+          <View style={styles.placeholderContent}>
+            <Text style={styles.placeholderText}>Mon Compte</Text>
+            <Text>Gérez votre profil et vos informations personnelles</Text>
+          </View>
+        );
+      case 'Factures':
+        return (
+          <View style={styles.placeholderContent}>
+            <Text style={styles.placeholderText}>Mes Factures</Text>
+            <Text>Consultez l'historique de vos factures</Text>
+          </View>
+        );
+      case 'Achats':
+        return (
+          <View style={styles.placeholderContent}>
+            <Text style={styles.placeholderText}>Mes Achats</Text>
+            <Text>Suivez vos achats d'électricité verte</Text>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Sowatt</Text>
+          </View>
+          <LoginButton 
+            onPress={() => Alert.alert(
+              'Authentification', 
+              'Fonctionnalité de connexion/déconnexion'
+            )} 
           />
-        )}
+          {activeTab === 'Panier' && cartItems.length > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
+            </View>
+          )}
+        </View>
+        
+        <View style={styles.content}>
+          {renderContent()}
+        </View>
+        
+        <BottomNavBar 
+          activeTab={activeTab}
+          onTabPress={setActiveTab}
+        />
       </ThemedView>
     </SafeAreaView>
   );
@@ -111,25 +154,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+    position: 'relative',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
   },
-  cartButton: {
-    position: 'relative',
-    padding: 8,
-  },
-  cartIcon: {
-    fontSize: 24,
+  content: {
+    flex: 1,
   },
   cartBadge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
+    top: 10,
+    right: 16,
     backgroundColor: '#FF5252',
     borderRadius: 10,
     minWidth: 20,
@@ -141,5 +185,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  placeholderContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  placeholderText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
