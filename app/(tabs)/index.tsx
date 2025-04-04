@@ -1,74 +1,145 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
+import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
+import { SowattList } from '@/components/ui/SowattList';
+import { CartList } from '@/components/ui/CartList';
+import { useState } from 'react';
+import { Sowatt } from '@/components/ui/SowattCard';
+
+interface CartItem {
+  sowatt: Sowatt;
+  quantity: number;
+}
 
 export default function HomeScreen() {
+  const [showCart, setShowCart] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  const sowatts = [
+    {
+      type: "Électricité solaire",
+      description: "Énergie verte produite par des panneaux solaires",
+      price: 0.15,
+      location: "Paris, France",
+      sellerName: "Jean Dupont",
+      isAvailable: true,
+      imageUrl: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=500&auto=format&fit=crop&q=60"
+    },
+    {
+      type: "Électricité éolienne",
+      description: "Énergie produite par des éoliennes domestiques",
+      price: 0.18,
+      location: "Lyon, France",
+      sellerName: "Marie Martin",
+      isAvailable: true,
+      imageUrl: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=500&auto=format&fit=crop&q=60"
+    },
+    {
+      type: "Électricité hydraulique",
+      description: "Énergie produite par une micro-centrale hydraulique",
+      price: 0.12,
+      location: "Bordeaux, France",
+      sellerName: "Pierre Durand",
+      isAvailable: false,
+      imageUrl: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&auto=format&fit=crop&q=60"
+    }
+  ];
+
+  const handleAddToCart = (sowatt: Sowatt, quantity: number) => {
+    setCartItems(prev => [...prev, { sowatt, quantity }]);
+  };
+
+  const handleRemoveItem = (sowatt: Sowatt) => {
+    setCartItems(prev => prev.filter(item => item.sowatt !== sowatt));
+  };
+
+  const handleUpdateQuantity = (sowatt: Sowatt, quantity: number) => {
+    setCartItems(prev => prev.map(item => 
+      item.sowatt === sowatt ? { ...item, quantity } : item
+    ));
+  };
+
+  const handleCheckout = () => {
+    // Logique pour passer la commande
+    console.log('Commande passée:', cartItems);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+    <SafeAreaView style={styles.safeArea}>
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Sowatt</Text>
+          <TouchableOpacity 
+            style={styles.cartButton}
+            onPress={() => setShowCart(!showCart)}
+          >
+            <Text style={styles.cartIcon}>🛒</Text>
+            {cartItems.length > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {showCart ? (
+          <CartList
+            items={cartItems}
+            onRemoveItem={handleRemoveItem}
+            onUpdateQuantity={handleUpdateQuantity}
+            onCheckout={handleCheckout}
+          />
+        ) : (
+          <SowattList 
+            sowatts={sowatts} 
+            onAddToCart={handleAddToCart}
+          />
+        )}
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  cartButton: {
+    position: 'relative',
+    padding: 8,
+  },
+  cartIcon: {
+    fontSize: 24,
+  },
+  cartBadge: {
     position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FF5252',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cartBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
