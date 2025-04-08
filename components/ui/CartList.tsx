@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import { Sowatt } from './SowattCard';
+import { PaymentView } from './PaymentView';
 
 interface CartItem {
   sowatt: Sowatt;
@@ -22,11 +23,26 @@ export const CartList: React.FC<CartListProps> = ({
   onUpdateQuantity,
   onCheckout,
 }) => {
+  const [showPayment, setShowPayment] = useState(false);
+
   const calculateTotal = () => {
     return items.reduce((total, item) => {
       return total + (item.sowatt.price * item.quantity);
     }, 0);
   };
+
+  if (showPayment) {
+    return (
+      <PaymentView
+        totalAmount={calculateTotal()}
+        onPaymentSuccess={() => {
+          onCheckout();
+          setShowPayment(false);
+        }}
+        onPaymentCancel={() => setShowPayment(false)}
+      />
+    );
+  }
 
   const renderItem = ({ item }: { item: CartItem }) => (
     <ThemedView style={styles.cartItem}>
@@ -82,7 +98,7 @@ export const CartList: React.FC<CartListProps> = ({
 
         <TouchableOpacity
           style={styles.checkoutButton}
-          onPress={onCheckout}
+          onPress={() => setShowPayment(true)}
         >
           <Text style={styles.checkoutButtonText}>Passer la commande</Text>
         </TouchableOpacity>

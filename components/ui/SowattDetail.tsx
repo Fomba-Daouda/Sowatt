@@ -65,13 +65,6 @@ export const SowattDetail: React.FC<SowattDetailProps> = ({
           {sowatt.isAvailable && (
             <View style={styles.actions}>
               <TouchableOpacity 
-                style={[styles.button, styles.orderButton]}
-                onPress={onOrder}
-              >
-                <Text style={styles.buttonText}>Passer la commande</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
                 style={[styles.button, styles.cartButton]}
                 onPress={onAddToCart}
               >

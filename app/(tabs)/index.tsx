@@ -6,6 +6,12 @@ import { BottomNavBar } from '@/components/ui/BottomNavBar';
 import { LoginButton } from '@/components/ui/LoginButton';
 import { useState } from 'react';
 import { Sowatt } from '@/components/ui/SowattCard';
+import { AccountDropdown } from '@/components/ui/AccountDropdown';
+import { router } from 'expo-router';
+import { LoginView } from '@/components/auth/LoginView';
+import { RegisterView } from '@/components/auth/RegisterView';
+import { BillView } from '@/components/ui/BillView';
+import { MeterView } from '@/components/ui/MeterView';
 
 interface CartItem {
   sowatt: Sowatt;
@@ -15,6 +21,10 @@ interface CartItem {
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState('Accueil');
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+  const [showMeters, setShowMeters] = useState(false);
 
   const sowatts = [
     {
@@ -65,6 +75,7 @@ export default function HomeScreen() {
     console.log('Commande passée:', cartItems);
   };
 
+
   const renderContent = () => {
     switch (activeTab) {
       case 'Accueil':
@@ -86,15 +97,16 @@ export default function HomeScreen() {
       case 'Compte':
         return (
           <View style={styles.placeholderContent}>
-            <Text style={styles.placeholderText}>Mon Compte</Text>
-            <Text>Gérez votre profil et vos informations personnelles</Text>
+            <AccountDropdown 
+              visible={showAccountDropdown} 
+              onClose={() => setShowAccountDropdown(false)}
+            />
           </View>
         );
       case 'Factures':
         return (
           <View style={styles.placeholderContent}>
-            <Text style={styles.placeholderText}>Mes Factures</Text>
-            <Text>Consultez l'historique de vos factures</Text>
+            <BillView />
           </View>
         );
       case 'Achats':
@@ -104,10 +116,48 @@ export default function HomeScreen() {
             <Text>Suivez vos achats d'électricité verte</Text>
           </View>
         );
+      case 'Compteurs':
+        return (
+          <View style={styles.placeholderContent}>
+            <MeterView 
+              onClose={() => {
+                setActiveTab('Compte');
+                setShowAccountDropdown(true);
+              }}
+              onBack={() => {
+                setActiveTab('Compte');
+                setShowAccountDropdown(true);
+              }}
+            />
+          </View>
+        );
       default:
         return null;
     }
   };
+
+  if (!isLoggedIn) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ThemedView style={styles.container}>
+          {showRegister ? (
+            <RegisterView 
+              onRegister={() => {
+                setIsLoggedIn(true);
+                setShowRegister(false);
+              }}
+              onNavigateToLogin={() => setShowRegister(false)}
+            />
+          ) : (
+            <LoginView 
+              onLogin={() => setIsLoggedIn(true)} 
+              onNavigateToRegister={() => setShowRegister(true)}
+            />
+          )}
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -116,17 +166,14 @@ export default function HomeScreen() {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Sowatt</Text>
           </View>
-          <LoginButton 
-            onPress={() => Alert.alert(
-              'Authentification', 
-              'Fonctionnalité de connexion/déconnexion'
-            )} 
+           <LoginButton 
+            isLoggedIn={isLoggedIn}
+            onPress={() => {
+              setIsLoggedIn(false);
+              router.replace('/(tabs)');
+            }} 
           />
-          {activeTab === 'Panier' && cartItems.length > 0 && (
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
-            </View>
-          )}
+          
         </View>
         
         <View style={styles.content}>
@@ -135,7 +182,15 @@ export default function HomeScreen() {
         
         <BottomNavBar 
           activeTab={activeTab}
-          onTabPress={setActiveTab}
+          onTabPress={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'Compte') {
+              setShowAccountDropdown(true);
+            } else {
+              setShowAccountDropdown(false);
+            }
+          }}
+          cartItemsCount={cartItems.length}
         />
       </ThemedView>
     </SafeAreaView>
@@ -145,9 +200,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#E8F5E9',
   },
   container: {
     flex: 1,
+    backgroundColor: '#E8F5E9',
   },
   header: {
     flexDirection: 'row',
@@ -155,9 +212,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: '#00A19B',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
-    position: 'relative',
   },
   titleContainer: {
     flexDirection: 'row',
@@ -166,9 +223,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'white',
   },
   content: {
     flex: 1,
+    backgroundColor: '#E8F5E9',
   },
   cartBadge: {
     position: 'absolute',
@@ -191,10 +250,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#E8F5E9',
   },
   placeholderText: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#00A19B',
   },
 });
