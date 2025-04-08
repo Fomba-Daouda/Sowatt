@@ -53,65 +53,62 @@ export function MeterView({ onClose, onBack }: MeterViewProps) {
   ]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={onBack}
-          >
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Mes Compteurs</Text>
-        </View>
-
-        <ScrollView style={styles.container}>
-          {meters.map((meter) => (
-            <View key={meter.id} style={styles.meterCard}>
-              <View style={styles.meterHeader}>
-                <Text style={styles.meterNumber}>Compteur {meter.number}</Text>
-                <View style={[
-                  styles.statusBadge,
-                  meter.status === 'Actif' ? styles.statusActive : styles.statusInactive
-                ]}>
-                  <Text style={styles.statusText}>{meter.status}</Text>
-                </View>
-              </View>
-              
-              <View style={styles.infoSection}>
-                <Text style={styles.infoLabel}>Type</Text>
-                <Text style={styles.infoValue}>{meter.type}</Text>
-              </View>
-
-              <View style={styles.infoSection}>
-                <Text style={styles.infoLabel}>Date d'installation</Text>
-                <Text style={styles.infoValue}>
-                  {new Date(meter.installationDate).toLocaleDateString('fr-FR')}
-                </Text>
-              </View>
-
-              <View style={styles.infoSection}>
-                <Text style={styles.infoLabel}>Adresse</Text>
-                <Text style={styles.infoValue}>{meter.address}</Text>
-              </View>
-
-              {meter.lastReading && (
-                <View style={styles.readingSection}>
-                  <Text style={styles.readingTitle}>Dernière lecture</Text>
-                  <View style={styles.readingInfo}>
-                    <Text style={styles.readingValue}>
-                      {meter.lastReading.value} {meter.lastReading.unit}
-                    </Text>
-                    <Text style={styles.readingDate}>
-                      {new Date(meter.lastReading.date).toLocaleDateString('fr-FR')}
-                    </Text>
-                  </View>
-                </View>
-              )}
-            </View>
-          ))}
-        </ScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={onBack}
+        >
+          <Ionicons name="arrow-back" size={24} color="#0066CC" />
+        </TouchableOpacity>
       </View>
+      <ScrollView style={styles.container}>
+        {meters.map((meter) => (
+          <View key={meter.id} style={styles.meterCard}>
+            <View style={styles.meterHeader}>
+              <Text style={styles.meterNumber}>Compteur {meter.number}</Text>
+              <View style={[
+                styles.statusBadge,
+                meter.status === 'Actif' ? styles.statusActive : styles.statusInactive
+              ]}>
+                <Text style={styles.statusText}>{meter.status}</Text>
+              </View>
+            </View>
+            
+            <View style={styles.infoSection}>
+              <Text style={styles.infoLabel}>Type</Text>
+              <Text style={styles.infoValue}>{meter.type}</Text>
+            </View>
+
+            <View style={styles.infoSection}>
+              <Text style={styles.infoLabel}>Date d'installation</Text>
+              <Text style={styles.infoValue}>
+                {new Date(meter.installationDate).toLocaleDateString('fr-FR')}
+              </Text>
+            </View>
+
+            <View style={styles.infoSection}>
+              <Text style={styles.infoLabel}>Adresse</Text>
+              <Text style={styles.infoValue}>{meter.address}</Text>
+            </View>
+
+            {meter.lastReading && (
+              <View style={styles.readingSection}>
+                <Text style={styles.readingTitle}>Dernière lecture</Text>
+                <View style={styles.readingInfo}>
+                  <Text style={styles.readingValue}>
+                    {meter.lastReading.value} {meter.lastReading.unit}
+                  </Text>
+                  <Text style={styles.readingDate}>
+                    {new Date(meter.lastReading.date).toLocaleDateString('fr-FR')}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        ))}
+      </ScrollView>
+     
     </SafeAreaView>
   );
 }
@@ -119,30 +116,35 @@ export function MeterView({ onClose, onBack }: MeterViewProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#E8F5E9',
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#F5F5F5',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#00A19B',
   },
   backButton: {
     padding: 8,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginLeft: 8,
-  },
   container: {
     flex: 1,
     padding: 16,
+    paddingBottom: 50,
+  },
+  closeButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#0066CC',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   meterCard: {
     backgroundColor: 'white',

@@ -7,120 +7,96 @@ interface ProfileViewProps {
   onBack: () => void;
 }
 
-interface UserInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  address: string;
-  postalCode: string;
-  city: string;
-}
-
 export function ProfileView({ onBack }: ProfileViewProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    address: '',
-    postalCode: '',
-    city: '',
+  const [userInfo, setUserInfo] = useState({
+    email: 'utilisateur@example.com',
+    phone: '+33 6 12 34 56 78',
+    password: '********',
+    address: '123 Rue de la Paix, 75001 Paris',
   });
 
   const handleSave = () => {
-    // TODO: Implémenter la sauvegarde des données
-    console.log('Sauvegarde des données:', userInfo);
+    setIsEditing(false);
+    // Ici, vous pouvez ajouter la logique pour sauvegarder les modifications
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={onBack}
-          >
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Mon Profil</Text>
-        </View>
+    <SafeAreaView style={styles.safeArea} >
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Ionicons name="arrow-back" size={24} color="#0066CC" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.editButton} 
+          onPress={() => isEditing ? handleSave() : setIsEditing(true)}
+        >
+          <Text style={styles.editButtonText}>
+            {isEditing ? 'Enregistrer' : 'Modifier'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        <ScrollView style={styles.container}>
+      <ScrollView style={styles.container}>
+        <View style={styles.card}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Informations personnelles</Text>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Prénom</Text>
-              <TextInput
-                style={styles.input}
-                value={userInfo.firstName}
-                onChangeText={(text) => setUserInfo({...userInfo, firstName: text})}
-                placeholder="Entrez votre prénom"
-                placeholderTextColor="#666"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Nom</Text>
-              <TextInput
-                style={styles.input}
-                value={userInfo.lastName}
-                onChangeText={(text) => setUserInfo({...userInfo, lastName: text})}
-                placeholder="Entrez votre nom"
-                placeholderTextColor="#666"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>Email</Text>
+            {isEditing ? (
               <TextInput
                 style={styles.input}
                 value={userInfo.email}
                 onChangeText={(text) => setUserInfo({...userInfo, email: text})}
-                placeholder="Entrez votre email"
-                placeholderTextColor="#666"
                 keyboardType="email-address"
+                autoCapitalize="none"
               />
-            </View>
+            ) : (
+              <Text style={styles.value}>{userInfo.email}</Text>
+            )}
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Adresse</Text>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Adresse</Text>
+            <Text style={styles.label}>Téléphone</Text>
+            {isEditing ? (
+              <TextInput
+                style={styles.input}
+                value={userInfo.phone}
+                onChangeText={(text) => setUserInfo({...userInfo, phone: text})}
+                keyboardType="phone-pad"
+              />
+            ) : (
+              <Text style={styles.value}>{userInfo.phone}</Text>
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Mot de passe</Text>
+            {isEditing ? (
+              <TextInput
+                style={styles.input}
+                value={userInfo.password}
+                onChangeText={(text) => setUserInfo({...userInfo, password: text})}
+                secureTextEntry
+              />
+            ) : (
+              <Text style={styles.value}>{userInfo.password}</Text>
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Adresse</Text>
+            {isEditing ? (
               <TextInput
                 style={styles.input}
                 value={userInfo.address}
                 onChangeText={(text) => setUserInfo({...userInfo, address: text})}
-                placeholder="Entrez votre adresse"
-                placeholderTextColor="#666"
+                multiline
               />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Code postal</Text>
-              <TextInput
-                style={styles.input}
-                value={userInfo.postalCode}
-                onChangeText={(text) => setUserInfo({...userInfo, postalCode: text})}
-                placeholder="Entrez votre code postal"
-                placeholderTextColor="#666"
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Ville</Text>
-              <TextInput
-                style={styles.input}
-                value={userInfo.city}
-                onChangeText={(text) => setUserInfo({...userInfo, city: text})}
-                placeholder="Entrez votre ville"
-                placeholderTextColor="#666"
-              />
-            </View>
+            ) : (
+              <Text style={styles.value}>{userInfo.address}</Text>
+            )}
           </View>
-
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Enregistrer les modifications</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -128,17 +104,17 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#E8F5E9',
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#F5F5F5',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#00A19B',
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   backButton: {
     padding: 8,
@@ -146,18 +122,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
-    marginLeft: 8,
+    color: '#00A19B',
+  },
+  editButton: {
+    padding: 8,
+  },
+  editButtonText: {
+    color: '#00A19B',
+    fontSize: 16,
+    fontWeight: '500',
   },
   container: {
     flex: 1,
     padding: 16,
   },
-  section: {
+  card: {
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 16,
-    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -167,38 +149,29 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#00A19B',
-  },
-  inputGroup: {
-    marginBottom: 16,
+  section: {
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    paddingBottom: 16,
   },
   label: {
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
   },
+  value: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
   input: {
+    fontSize: 16,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    backgroundColor: '#F9F9F9',
     color: '#333',
-  },
-  saveButton: {
-    backgroundColor: '#00A19B',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 }); 

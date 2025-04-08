@@ -127,13 +127,15 @@ export function BillView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 5,
   },
   billCard: {
+    width: "100%",
     backgroundColor: 'white',
     borderRadius: 8,
-    padding: 16,
+    padding: 20,
     marginBottom: 16,
+    marginHorizontal: 0,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

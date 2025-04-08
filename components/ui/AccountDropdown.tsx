@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Modal } from 'react-native';
 import { MeterView } from './MeterView';
 import { ProfileView } from './ProfileView';
+import { MessageView } from './MessageView';
 
 interface AccountDropdownProps {
   visible?: boolean;
@@ -11,7 +12,7 @@ interface AccountDropdownProps {
 export function AccountDropdown({ visible = false, onClose }: AccountDropdownProps) {
   const [showMeters, setShowMeters] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-
+  const [showMessages, setShowMessages] = useState(false);
   if (!visible) return null;
 
   const menuItems = [
@@ -28,6 +29,9 @@ export function AccountDropdown({ visible = false, onClose }: AccountDropdownPro
       setShowMeters(true);
     } else if (itemId === 'profil') {
       setShowProfile(true);
+    }
+      else if (itemId === 'messages') {
+        setShowMessages(true);
     } else {
       onClose?.();
     }
@@ -82,6 +86,27 @@ export function AccountDropdown({ visible = false, onClose }: AccountDropdownPro
           />
         </View>
       </Modal>
+
+      <Modal
+        visible={showMessages}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowMessages(false);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <MessageView />
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              setShowMessages(false);
+              onClose?.();
+            }}
+          >
+            <Text style={styles.backButtonText}>Retour</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -120,5 +145,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#0066CC',
     fontWeight: '500',
-  }
+  },
+  backButton: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 8,
+    margin: 16,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 }); 
